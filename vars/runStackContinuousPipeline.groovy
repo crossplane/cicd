@@ -33,7 +33,7 @@ def call() {
                     // The build step turns this into a "dirty" environment from the perspective of `git describe`,
                     // so we set the version once at the beginning and use it for both the build and publish steps.
 
-                    sh """STACK_VERSION=$( git describe --tags --dirty --always )
+                    sh """STACK_VERSION=\$( git describe --tags --dirty --always )
                           STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-build
                           STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-publish
                     """
