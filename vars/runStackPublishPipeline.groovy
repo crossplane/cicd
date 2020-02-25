@@ -15,6 +15,9 @@ def call() {
         environment {
             DOCKER = credentials('dockerhub-upboundci')
             CROSSPLANE_CLI_RELEASE = 'master'
+            // The promote channel is a tag which is used as a release channel. It's
+            // updated whenever a new artifact is ready for that channel.
+            PROMOTE_CHANNEL = 'alpha'
         }
 
         stages {
@@ -24,7 +27,7 @@ def call() {
                     sh "curl -sL https://raw.githubusercontent.com/crossplane/crossplane-cli/${CROSSPLANE_CLI_RELEASE}/bootstrap.sh | env PREFIX=${WORKSPACE} RELEASE=${CROSSPLANE_CLI_RELEASE} bash"
                 }
             }
-            stage('Promote Release') {
+            stage('Publish Release') {
 
                 steps {
                     // The build step turns this into a "dirty" environment from the perspective of `git describe`,
@@ -34,6 +37,18 @@ def call() {
                           STACK_VERSION=\${STACK_VERSION:-\$( git describe --tags --dirty --always )}
                           STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-build
                           STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-publish
+                    """
+                }
+            }
+
+            stage('Promote Release to Channel') {
+
+                steps {
+                    // Ideally we wouldn't be rebuilding and repushing (a true promote would use the same artifact),
+                    // but this is easier to implement.
+
+                    sh """STACK_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-stack-build
+                          STACK_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-stack-publish
                     """
                 }
             }
