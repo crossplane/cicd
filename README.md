@@ -25,3 +25,7 @@ runStackBranchPipeline()
 There are other ways to load shared libraries. See [the Jenkins Pipeline
 documentation](https://jenkins.io/doc/book/pipeline/shared-libraries/)
 for more detail.
+
+## How do I use the pipelines once I set them up?
+
+See [this guide](docs/pipelines.md).
