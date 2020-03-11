@@ -54,6 +54,15 @@ def call() {
                     """
                 }
             }
+
+            stage('Sync images') {
+
+                steps {
+                    // We don't need to wait, and waiting takes up an executor slot
+                    build job: '/crossplane/sync-stacks', wait: false
+                }
+
+            }
         }
 
         post {
