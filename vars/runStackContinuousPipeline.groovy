@@ -34,6 +34,8 @@ def call() {
             stage('Publish Release') {
 
                 steps {
+                    sh 'docker login -u="${DOCKER_USR}" -p="${DOCKER_PSW}"'
+
                     // The build step turns this into a "dirty" environment from the perspective of `git describe`,
                     // so we set the version once at the beginning and use it for both the build and publish steps.
 
@@ -63,6 +65,8 @@ def call() {
             stage('Promote Release to Channel') {
 
                 steps {
+                    sh 'docker login -u="${DOCKER_USR}" -p="${DOCKER_PSW}"'
+
                     // Ideally we wouldn't be rebuilding and repushing (a true promote would use the same artifact),
                     // but this is easier to implement.
 

@@ -52,6 +52,13 @@ Typically we copy from an existing item. The general steps are:
 * Once the folder is created, go into each of the jobs that was created,
   and update the Git url to point to your repository.
 
+### What about docker credentials?
+
+The shared Jenkins code takes care of that for us. It loads the docker
+credentials early in its configuration, and then does a `docker login`
+before docker operations, using environment variables set by Jenkins
+when the docker credentials are loaded.
+
 ### How do I cut a release?
 
 Cutting a release involves: tagging a commit for a release; building and

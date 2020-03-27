@@ -38,6 +38,8 @@ def call() {
             stage('Publish Release') {
 
                 steps {
+                    sh 'docker login -u="${DOCKER_USR}" -p="${DOCKER_PSW}"'
+
                     sh """
                           STACK_VERSION=${params.version}
                           STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-build
@@ -49,6 +51,8 @@ def call() {
             stage('Promote Release to Channel') {
 
                 steps {
+                    sh 'docker login -u="${DOCKER_USR}" -p="${DOCKER_PSW}"'
+
                     // Ideally we wouldn't be rebuilding and repushing (a true promote would use the same artifact),
                     // but this is easier to implement.
 
