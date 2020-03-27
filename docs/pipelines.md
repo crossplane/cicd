@@ -16,8 +16,11 @@ Each of them has a different purpose.
 
 ### What repository can I use as a reference?
 
-Try out the [sample-stack-wordpress repo](https://github.com/crossplane/sample-stack-wordpress).
-Take a look at the `Jenkinsfile.*` files.
+Try out the [app-wordpress
+repo](https://github.com/crossplane/app-wordpress).
+Take a look at the `Jenkinsfile.*` files. To see the Jenkins jobs that
+result, take a look at the [app-wordpress Jenkins folder on the Upbound
+Jenkins](https://jenkinsci.upbound.io/job/crossplane/job/app-wordpress/).
 
 ### What else is needed other than Jenkinsfiles?
 
@@ -45,27 +48,37 @@ Typically we copy from an existing item. The general steps are:
 * At the top, enter in the name of your repository, such as
   `stack-my-app`.
 * At the bottom, in the `Copy from` field, enter in an existing stack
-  folder, such as `sample-stack-wordpress`.
+  folder, such as `app-wordpress`.
 * Once the folder is created, go into each of the jobs that was created,
   and update the Git url to point to your repository.
 
+### What about docker credentials?
+
+The shared Jenkins code takes care of that for us. It loads the docker
+credentials early in its configuration, and then does a `docker login`
+before docker operations, using environment variables set by Jenkins
+when the docker credentials are loaded.
+
 ### How do I cut a release?
 
-Cutting a release involves: (potentially) cutting a new release branch;
-tagging a commit for a release; building and publishing from the tagged
-commit. Using the jobs, the steps are:
+Cutting a release involves: tagging a commit for a release; building and
+publishing from the tagged commit. Using the jobs, the steps are:
 
-1. Using the job `branch-create`, create a release branch if one doesn't
-   exist. We use the convention `release-MAJOR.MINOR`. For example:
-   `release-0.1`. If a branch already exists for the release version
-   prefix, update the branch with the new changes instead of creating a
-   new one.
-2. Using the job `tag`, tag the commit you want to release, with the
-   release tag. The tag should be in the form `vMAJOR.MINOR.PATCH`. For
-   example: `v0.1.0`.
-3. Using the job `publish`, build and publish the tag you want to
+1. Using the job `tag`, tag the `master` branch with the release tag.
+   The tag should be in the form `vMAJOR.MINOR.PATCH`. For example:
+   `v0.1.0`.
+2. Using the job `publish`, build and publish the tag you want to
    release. You should be able to do this using the same tag as what you
    used in the tagging step.
+
+**Release branches**: We do not use release branches for a release in
+most scenarios. We originally did, and realized we were not getting any
+benefit from them, so we removed them from the process to simplify
+things. If we end up needing them in the future, we can change the
+process to be more robust. Release branches would become useful if we
+needed to develop and maintain multiple distinct versions at the same
+time. They're also useful for doing a patch release of a version which
+was not the most recently released version.
 
 **NOTE - KNOWN ISSUE**: You may need to run a job multiple times when a
 new branch is recognized by Jenkins. We are currently using multibranch
@@ -75,6 +88,27 @@ what parameters are needed to run the job successfully, so it doesn't
 let you specify any parameters, and the job may fail. After the first
 execution, Jenkins will let you specify parameters, and you can run it
 again with parameters. It isn't ideal, but that's the current pattern.
+
+#### Patch Releases
+
+A patch release is a release with bug fixes, where the patch version is
+incremented. For example, a patch release after `v0.1.0` would be
+`v0.1.1`.
+
+If the patch release is a patch of the most recently released version,
+the process is the same as a normal release.
+
+If the patch is for a version before the most recent release, a release
+branch will be needed.
+
+To create a release branch, use the job `branch-create`, and use the
+tag that we want to create a patch release from. For example, if we
+previously released `v0.1.0`, and we want to cut the patch release
+`v0.1.1`, create the branch from the `v0.1.0` tag. We use the convention
+`release-MAJOR.MINOR` for naming release branches. For example:
+`release-0.1`. If a branch already exists for the release version
+prefix, update the branch with the new changes instead of creating a new
+one.
 
 ### How do I get my merges to master automatically released?
 
