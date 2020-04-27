@@ -41,9 +41,9 @@ def call() {
                     sh 'docker login -u="${DOCKER_USR}" -p="${DOCKER_PSW}"'
 
                     sh """
-                          STACK_VERSION=${params.version}
-                          STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-build
-                          STACK_VERSION=\${STACK_VERSION} ./bin/kubectl-crossplane-stack-publish
+                          PACKAGE_VERSION=${params.version}
+                          PACKAGE_VERSION=\${PACKAGE_VERSION} ./bin/kubectl-crossplane-package-build
+                          PACKAGE_VERSION=\${PACKAGE_VERSION} ./bin/kubectl-crossplane-package-publish
                     """
                 }
             }
@@ -56,8 +56,8 @@ def call() {
                     // Ideally we wouldn't be rebuilding and repushing (a true promote would use the same artifact),
                     // but this is easier to implement.
 
-                    sh """STACK_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-stack-build
-                          STACK_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-stack-publish
+                    sh """PACKAGE_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-package-build
+                          PACKAGE_VERSION=${PROMOTE_CHANNEL} ./bin/kubectl-crossplane-package-publish
                     """
                 }
             }
